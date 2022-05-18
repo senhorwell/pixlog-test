@@ -16,7 +16,9 @@ class _HomePageState extends State<HomePage> {
   TextEditingController search = TextEditingController();
   var resourceList;
   late List<String> languageList;
-  late String languageIndex = "EN-G";
+  late List<String> moduleList;
+  late String languageIndex;
+  late String moduleIndex;
 
   String convertDate(date) {
     return DateFormat('dd/MM/yy').format(DateTime.parse(date).toLocal()).toString();
@@ -25,6 +27,9 @@ class _HomePageState extends State<HomePage> {
   loadScreen() async {
     resourceList = await translateService.getResources();
     var returned = TranslateService().organizeFilters(resourceList);
+    moduleIndex = returned["moduleList"][0];
+    moduleList = returned["moduleList"];
+    languageIndex = returned["languageList"][0];
     languageList = returned["languageList"];
     return resourceList;
   }
@@ -52,7 +57,7 @@ class _HomePageState extends State<HomePage> {
           return Column(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: TextFormField(
                   controller: search,
                   cursorColor: AppColors.primary,
@@ -88,7 +93,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: DropdownButtonFormField(
                   value: languageIndex,
                   decoration: const InputDecoration(
@@ -120,6 +125,51 @@ class _HomePageState extends State<HomePage> {
                     }
                   },
                   items: languageList.map((String val) {
+                    return DropdownMenuItem(
+                      value: val,
+                      child: Text(
+                        val,
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                child: DropdownButtonFormField(
+                  value: moduleIndex,
+                  decoration: const InputDecoration(
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide:
+                        BorderSide(color: AppColors.primary, width: 1.5),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide:
+                        BorderSide(color: AppColors.primary, width: 1.5),
+                      ),
+                      border: UnderlineInputBorder(
+                        borderSide:
+                        BorderSide(color: AppColors.primary, width: 1.5),
+                      ),
+                      labelText: 'Módulos',
+                      labelStyle: TextStyle(color: AppColors.primary,fontSize: 20)
+                  ),
+                  isExpanded: true,
+                  onChanged: (String? value) {
+                    setState((){
+                      resourceList = TranslateService().searchResource(resourceList, value);
+                    });
+                  },
+                  onSaved: (String? value) {
+                  },
+                  validator: (String? value) {
+                    if (value!.isEmpty) {
+                      return "Não pode estar vazio";
+                    } else {
+                      return null;
+                    }
+                  },
+                  items: moduleList.map((String val) {
                     return DropdownMenuItem(
                       value: val,
                       child: Text(
