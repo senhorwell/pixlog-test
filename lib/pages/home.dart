@@ -14,23 +14,29 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   TranslateService translateService = TranslateService();
   TextEditingController search = TextEditingController();
-  var resourceList;
+  var resourceList = [];
+  var resourceListFiltered = [];
   late List<String> languageList;
   late List<String> moduleList;
   late String languageIndex;
   late String moduleIndex;
+  var initialized = false;
 
   String convertDate(date) {
     return DateFormat('dd/MM/yy').format(DateTime.parse(date).toLocal()).toString();
   }
 
   loadScreen() async {
-    resourceList = await translateService.getResources();
-    var returned = TranslateService().organizeFilters(resourceList);
-    moduleIndex = returned["moduleList"][0];
-    moduleList = returned["moduleList"];
-    languageIndex = returned["languageList"][0];
-    languageList = returned["languageList"];
+    if (!initialized) {
+      resourceList = await translateService.getResourceFake();
+      resourceListFiltered = resourceList;
+      var returned = TranslateService().organizeFilters(resourceList);
+      moduleIndex = returned["moduleList"][0];
+      moduleList = returned["moduleList"];
+      languageIndex = returned["languageList"][0];
+      languageList = returned["languageList"];
+      initialized = true;
+    }
     return resourceList;
   }
   @override
@@ -63,7 +69,7 @@ class _HomePageState extends State<HomePage> {
                   cursorColor: AppColors.primary,
                   onChanged: (text) {
                     setState((){
-                      resourceList = translateService.searchResource(resourceList,text);
+                      resourceListFiltered = translateService.searchResource(resourceList,text,"value");
                     });
                   },
                   decoration: InputDecoration(
@@ -79,11 +85,11 @@ class _HomePageState extends State<HomePage> {
                         borderSide:
                         BorderSide(color: AppColors.primary, width: 1.5),
                       ),
-                      prefixIcon: IconButton(
+                      suffixIcon: IconButton(
                         icon: const Icon(Icons.search,color: AppColors.primary),
                         onPressed: () {
                           setState((){
-                            resourceList = translateService.searchResource(resourceList,search.text);
+                            resourceListFiltered = translateService.searchResource(resourceList,search.text,"value");
                           });
                         },
                       ),
@@ -92,96 +98,107 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                child: DropdownButtonFormField(
-                  value: languageIndex,
-                  decoration: const InputDecoration(
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide:
-                      BorderSide(color: AppColors.primary, width: 1.5),
+              Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                      child: DropdownButtonFormField(
+                        value: languageIndex,
+                        decoration: const InputDecoration(
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide:
+                            BorderSide(color: AppColors.primary, width: 1.5),
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide:
+                            BorderSide(color: AppColors.primary, width: 1.5),
+                          ),
+                          border: UnderlineInputBorder(
+                            borderSide:
+                            BorderSide(color: AppColors.primary, width: 1.5),
+                          ),
+                          labelText: 'Idiomas',
+                          labelStyle: TextStyle(color: AppColors.primary,fontSize: 20)
+                        ),
+                        isExpanded: true,
+                        onChanged: (String? value) {
+                          setState((){
+                            resourceListFiltered = TranslateService().searchResource(resourceList, value, "language_id");
+                          });
+                        },
+                        onSaved: (String? value) {
+                        },
+                        validator: (String? value) {
+                          if (value!.isEmpty) {
+                            return "Não pode estar vazio";
+                          } else {
+                            return null;
+                          }
+                        },
+                        items: languageList.map((String val) {
+                          return DropdownMenuItem(
+                            value: val,
+                            child: Text(
+                              val,
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide:
-                      BorderSide(color: AppColors.primary, width: 1.5),
-                    ),
-                    border: UnderlineInputBorder(
-                      borderSide:
-                      BorderSide(color: AppColors.primary, width: 1.5),
-                    ),
-                    labelText: 'Idiomas',
-                    labelStyle: TextStyle(color: AppColors.primary,fontSize: 20)
                   ),
-                  isExpanded: true,
-                  onChanged: (String? value) {
-                  },
-                  onSaved: (String? value) {
-                  },
-                  validator: (String? value) {
-                    if (value!.isEmpty) {
-                      return "Não pode estar vazio";
-                    } else {
-                      return null;
-                    }
-                  },
-                  items: languageList.map((String val) {
-                    return DropdownMenuItem(
-                      value: val,
-                      child: Text(
-                        val,
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                      child: DropdownButtonFormField(
+                        value: moduleIndex,
+                        decoration: const InputDecoration(
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide:
+                              BorderSide(color: AppColors.primary, width: 1.5),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide:
+                              BorderSide(color: AppColors.primary, width: 1.5),
+                            ),
+                            border: UnderlineInputBorder(
+                              borderSide:
+                              BorderSide(color: AppColors.primary, width: 1.5),
+                            ),
+                            labelText: 'Módulos',
+                            labelStyle: TextStyle(color: AppColors.primary,fontSize: 20)
+                        ),
+                        isExpanded: true,
+                        onChanged: (String? value) {
+                          setState((){
+                            resourceListFiltered = TranslateService().searchResource(resourceList, value, "module_id");
+                          });
+                        },
+                        onSaved: (String? value) {
+                        },
+                        validator: (String? value) {
+                          if (value!.isEmpty) {
+                            return "Não pode estar vazio";
+                          } else {
+                            return null;
+                          }
+                        },
+                        items: moduleList.map((String val) {
+                          return DropdownMenuItem(
+                            value: val,
+                            child: Text(
+                              val,
+                            ),
+                          );
+                        }).toList(),
                       ),
-                    );
-                  }).toList(),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                child: DropdownButtonFormField(
-                  value: moduleIndex,
-                  decoration: const InputDecoration(
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide:
-                        BorderSide(color: AppColors.primary, width: 1.5),
-                      ),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide:
-                        BorderSide(color: AppColors.primary, width: 1.5),
-                      ),
-                      border: UnderlineInputBorder(
-                        borderSide:
-                        BorderSide(color: AppColors.primary, width: 1.5),
-                      ),
-                      labelText: 'Módulos',
-                      labelStyle: TextStyle(color: AppColors.primary,fontSize: 20)
+                    ),
                   ),
-                  isExpanded: true,
-                  onChanged: (String? value) {
-                    setState((){
-                      resourceList = TranslateService().searchResource(resourceList, value);
-                    });
-                  },
-                  onSaved: (String? value) {
-                  },
-                  validator: (String? value) {
-                    if (value!.isEmpty) {
-                      return "Não pode estar vazio";
-                    } else {
-                      return null;
-                    }
-                  },
-                  items: moduleList.map((String val) {
-                    return DropdownMenuItem(
-                      value: val,
-                      child: Text(
-                        val,
-                      ),
-                    );
-                  }).toList(),
-                ),
+                ],
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: resourceList.length,
+                  itemCount: resourceListFiltered.length,
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -197,7 +214,7 @@ class _HomePageState extends State<HomePage> {
                                 child: Column(
                                   children: [
                                     const Icon(Icons.translate,size: 40,color: AppColors.searchIcon),
-                                    Text(resourceList[index]["resource"]["language_id"]),
+                                    Text(resourceListFiltered[index]["resource"]["language_id"].toUpperCase()),
                                   ],
                                 ),
                               ),
@@ -205,9 +222,8 @@ class _HomePageState extends State<HomePage> {
                                 flex: 2,
                                 child: Column(
                                   children: [
-                                    Text(resourceList[index]["resource"]["resource_id"]),
-                                    Text(resourceList[index]["resource"]["module_id"]),
-                                    Text(resourceList[index]["resource"]["value"]),
+                                    Text(resourceListFiltered[index]["resource"]["value"],style: const TextStyle(fontSize: 17,fontWeight: FontWeight.bold),textAlign: TextAlign.center,),
+                                    Text(resourceListFiltered[index]["resource"]["resource_id"],textAlign: TextAlign.center,),
                                   ],
                                 ),
                               ),
@@ -215,8 +231,7 @@ class _HomePageState extends State<HomePage> {
                                 flex: 1,
                                 child: Column(
                                   children: [
-                                    Text(convertDate(resourceList[index]["resource"]["created_at"])),
-                                    Text(convertDate(resourceList[index]["resource"]["updated_at"]))
+                                    Text(convertDate(resourceListFiltered[index]["resource"]["updated_at"]))
                                   ],
                                 ),
                               ),
