@@ -15,11 +15,19 @@ class _HomePageState extends State<HomePage> {
   TranslateService translateService = TranslateService();
   TextEditingController search = TextEditingController();
   var resourceList;
+  late List<String> languageList;
+  late String languageIndex = "EN-G";
 
   String convertDate(date) {
     return DateFormat('dd/MM/yy').format(DateTime.parse(date).toLocal()).toString();
   }
 
+  loadScreen() async {
+    resourceList = await translateService.getResources();
+    var returned = TranslateService().organizeFilters(resourceList);
+    languageList = returned["languageList"];
+    return resourceList;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,57 +38,99 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: AppColors.primary,
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-            child: TextFormField(
-              controller: search,
-              cursorColor: AppColors.primary,
-              onChanged: (text) {
-                setState((){
-                  resourceList = translateService.searchResource(resourceList,text);
-                });
-              },
-              decoration: InputDecoration(
-                  enabledBorder: const UnderlineInputBorder(
-                    borderSide:
-                    BorderSide(color: AppColors.primary, width: 1.5),
-                  ),
-                  focusedBorder: const UnderlineInputBorder(
-                    borderSide:
-                    BorderSide(color: AppColors.primary, width: 1.5),
-                  ),
-                  border: const UnderlineInputBorder(
-                    borderSide:
-                    BorderSide(color: AppColors.primary, width: 1.5),
-                  ),
-                  prefixIcon: IconButton(
-                    icon: const Icon(Icons.search,color: AppColors.primary),
-                    onPressed: () {
-                      setState((){
-                        resourceList = translateService.searchResource(resourceList,search.text);
-                      });
-                    },
-                  ),
-                  labelText: 'Buscar tradução',
-                labelStyle: const TextStyle(color: AppColors.primary)
+      body: FutureBuilder(
+        future: loadScreen(),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.data == null) {
+            return const Center(
+              child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary)
               ),
-            ),
-          ),
-          Expanded(
-            child: FutureBuilder(
-              future: translateService.getResources(),
-              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                if (snapshot.data == null) {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary)),
-                  );
-                }
-                resourceList = snapshot.data["resource"];
+            );
+          }
 
-                return ListView.builder(
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                child: TextFormField(
+                  controller: search,
+                  cursorColor: AppColors.primary,
+                  onChanged: (text) {
+                    setState((){
+                      resourceList = translateService.searchResource(resourceList,text);
+                    });
+                  },
+                  decoration: InputDecoration(
+                      enabledBorder: const UnderlineInputBorder(
+                        borderSide:
+                        BorderSide(color: AppColors.primary, width: 1.5),
+                      ),
+                      focusedBorder: const UnderlineInputBorder(
+                        borderSide:
+                        BorderSide(color: AppColors.primary, width: 1.5),
+                      ),
+                      border: const UnderlineInputBorder(
+                        borderSide:
+                        BorderSide(color: AppColors.primary, width: 1.5),
+                      ),
+                      prefixIcon: IconButton(
+                        icon: const Icon(Icons.search,color: AppColors.primary),
+                        onPressed: () {
+                          setState((){
+                            resourceList = translateService.searchResource(resourceList,search.text);
+                          });
+                        },
+                      ),
+                      labelText: 'Buscar tradução',
+                      labelStyle: const TextStyle(color: AppColors.primary)
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                child: DropdownButtonFormField(
+                  value: languageIndex,
+                  decoration: const InputDecoration(
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide:
+                      BorderSide(color: AppColors.primary, width: 1.5),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide:
+                      BorderSide(color: AppColors.primary, width: 1.5),
+                    ),
+                    border: UnderlineInputBorder(
+                      borderSide:
+                      BorderSide(color: AppColors.primary, width: 1.5),
+                    ),
+                    labelText: 'Idiomas',
+                    labelStyle: TextStyle(color: AppColors.primary,fontSize: 20)
+                  ),
+                  isExpanded: true,
+                  onChanged: (String? value) {
+                  },
+                  onSaved: (String? value) {
+                  },
+                  validator: (String? value) {
+                    if (value!.isEmpty) {
+                      return "Não pode estar vazio";
+                    } else {
+                      return null;
+                    }
+                  },
+                  items: languageList.map((String val) {
+                    return DropdownMenuItem(
+                      value: val,
+                      child: Text(
+                        val,
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
                   itemCount: resourceList.length,
                   itemBuilder: (context, index) {
                     return Padding(
@@ -126,11 +176,11 @@ class _HomePageState extends State<HomePage> {
                       ),
                     );
                   },
-                );
-              }
-            ),
-          ),
-        ],
+                ),
+              ),
+            ],
+          );
+        }
       )
     );
   }

@@ -9,19 +9,12 @@ class TranslateService {
         Uri.parse('http://portal.greenmilesoftware.com/get_resources_since'),
       );
 
-      return {
-        "result": true,
-        "resource": jsonDecode(response.body)
-      };
+      return jsonDecode(response.body);
     } catch (e) {
       print(e.toString());
     } finally {
       client.close();
     }
-
-    return {
-      "result": false,
-    };
   }
 
   searchResource(resources,searchName) {
@@ -32,5 +25,18 @@ class TranslateService {
       }
     }
     return filteredResources;
+  }
+
+  organizeFilters(resources) {
+    List<String> languageList = [];
+    List<String> moduleList = [];
+    for(int i=0;i<10;i++){
+      languageList.add(resources[i]["resource"]["language_id"].toUpperCase());
+      moduleList.add(resources[i]["resource"]["module_id"].toUpperCase());
+    }
+    return {
+      "languageList": languageList,
+      "moduleList": moduleList
+    };
   }
 }
