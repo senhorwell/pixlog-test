@@ -23,6 +23,9 @@ Como dito na descrição, este projeto é uma listagem simples de um json baixad
 #### Splashscreen
 ![image](https://user-images.githubusercontent.com/43894406/169191987-5cb7d2c0-f7f5-4a96-9569-a9e44b964194.png)
 
+#### Icone do app
+![image](https://user-images.githubusercontent.com/43894406/169194794-cbbd414c-7f41-4454-a3bf-fc883d6ceb7a.png)
+
 #### Home
 ![image](https://user-images.githubusercontent.com/43894406/169192074-a216942a-2dc8-45a0-b89a-1849c763e692.png)
 
