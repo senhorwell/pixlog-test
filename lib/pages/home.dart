@@ -10,7 +10,6 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-
 class _HomePageState extends State<HomePage> {
   TranslateService translateService = TranslateService();
   TextEditingController search = TextEditingController();
@@ -28,6 +27,12 @@ class _HomePageState extends State<HomePage> {
     } else {
       return DateFormat('dd/MM/yy').format(DateTime.parse(DateTime.now().toString()).toLocal()).toString();
     }
+  }
+
+  UnderlineInputBorder underlineInputBorderStyle() {
+    return const UnderlineInputBorder(
+      borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+    );
   }
 
   loadScreen() async {
@@ -79,18 +84,9 @@ class _HomePageState extends State<HomePage> {
                     });
                   },
                   decoration: InputDecoration(
-                      enabledBorder: const UnderlineInputBorder(
-                        borderSide:
-                        BorderSide(color: AppColors.primary, width: 1.5),
-                      ),
-                      focusedBorder: const UnderlineInputBorder(
-                        borderSide:
-                        BorderSide(color: AppColors.primary, width: 1.5),
-                      ),
-                      border: const UnderlineInputBorder(
-                        borderSide:
-                        BorderSide(color: AppColors.primary, width: 1.5),
-                      ),
+                      enabledBorder: underlineInputBorderStyle(),
+                      focusedBorder: underlineInputBorderStyle(),
+                      border:  underlineInputBorderStyle(),
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.search,color: AppColors.primary),
                         onPressed: () {
@@ -113,21 +109,12 @@ class _HomePageState extends State<HomePage> {
                       padding: const EdgeInsets.symmetric(horizontal: 5),
                       child: DropdownButtonFormField(
                         value: languageIndex,
-                        decoration: const InputDecoration(
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide:
-                            BorderSide(color: AppColors.primary, width: 1.5),
-                          ),
-                          focusedBorder: UnderlineInputBorder(
-                            borderSide:
-                            BorderSide(color: AppColors.primary, width: 1.5),
-                          ),
-                          border: UnderlineInputBorder(
-                            borderSide:
-                            BorderSide(color: AppColors.primary, width: 1.5),
-                          ),
+                        decoration: InputDecoration(
+                          enabledBorder: underlineInputBorderStyle(),
+                          focusedBorder: underlineInputBorderStyle(),
+                          border: underlineInputBorderStyle(),
                           labelText: 'Idiomas',
-                          labelStyle: TextStyle(color: AppColors.primary,fontSize: 20)
+                          labelStyle: const TextStyle(color: AppColors.primary,fontSize: 20)
                         ),
                         isExpanded: true,
                         onChanged: (String? value) {
@@ -140,15 +127,6 @@ class _HomePageState extends State<HomePage> {
                               resourceListFiltered = TranslateService().searchResource(resourceList, "", "language_id");
                             }
                           });
-                        },
-                        onSaved: (String? value) {
-                        },
-                        validator: (String? value) {
-                          if (value!.isEmpty) {
-                            return "Não pode estar vazio";
-                          } else {
-                            return null;
-                          }
                         },
                         items: languageList.map((String val) {
                           return DropdownMenuItem(
@@ -166,21 +144,12 @@ class _HomePageState extends State<HomePage> {
                       padding: const EdgeInsets.symmetric(horizontal: 5),
                       child: DropdownButtonFormField(
                         value: moduleIndex,
-                        decoration: const InputDecoration(
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide:
-                              BorderSide(color: AppColors.primary, width: 1.5),
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide:
-                              BorderSide(color: AppColors.primary, width: 1.5),
-                            ),
-                            border: UnderlineInputBorder(
-                              borderSide:
-                              BorderSide(color: AppColors.primary, width: 1.5),
-                            ),
+                        decoration: InputDecoration(
+                            enabledBorder: underlineInputBorderStyle(),
+                            focusedBorder: underlineInputBorderStyle(),
+                            border: underlineInputBorderStyle(),
                             labelText: 'Módulos',
-                            labelStyle: TextStyle(color: AppColors.primary,fontSize: 20)
+                            labelStyle: const TextStyle(color: AppColors.primary,fontSize: 20)
                         ),
                         isExpanded: true,
                         onChanged: (String? value) {
@@ -193,15 +162,6 @@ class _HomePageState extends State<HomePage> {
                               resourceListFiltered = TranslateService().searchResource(resourceList, "", "module_id");
                             }
                           });
-                        },
-                        onSaved: (String? value) {
-                        },
-                        validator: (String? value) {
-                          if (value!.isEmpty) {
-                            return "Não pode estar vazio";
-                          } else {
-                            return null;
-                          }
                         },
                         items: moduleList.map((String val) {
                           return DropdownMenuItem(
@@ -272,10 +232,8 @@ class _HomePageState extends State<HomePage> {
         onPressed: () {
           TranslateService().cleanLocalResources();
           Navigator.of(context).pushReplacement(PageRouteBuilder(
-            pageBuilder: (c, a1, a2) => const HomePage(),
-            transitionsBuilder: (c, anim, a2, child) => FadeTransition(opacity: anim, child: child),
-            transitionDuration: const Duration(milliseconds: 500),
-          ),);
+            pageBuilder: (c, a1, a2) => const HomePage()
+          ));
         },
         child: const Icon(Icons.restart_alt_rounded),
       ),
