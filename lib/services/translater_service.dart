@@ -16,8 +16,8 @@ class TranslateService {
       var response = await http.get(
         Uri.parse('http://portal.greenmilesoftware.com/get_resources_since'),
       );
-      prefs.setString('resources', response.body);
-      return jsonDecode(response.body);
+      prefs.setString('resources', utf8.decode(response.bodyBytes));
+      return jsonDecode(utf8.decode(response.bodyBytes));
     } catch (e) {
       showDialog<String>(
         barrierDismissible: false,
