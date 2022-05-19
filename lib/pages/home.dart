@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
 
   loadScreen() async {
     if (!initialized) {
-      resourceList = await translateService.getResources();
+      resourceList = await translateService.getResources(context);
       resourceListFiltered = resourceList;
       var returned = TranslateService().organizeFilters(resourceList);
       moduleIndex = returned["moduleList"][0];

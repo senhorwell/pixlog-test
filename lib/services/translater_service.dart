@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TranslateService {
-  getResources() async {
+  getResources(context) async {
     final prefs = await SharedPreferences.getInstance();
     final String? resources = prefs.getString('resources');
 
@@ -18,7 +19,22 @@ class TranslateService {
       prefs.setString('resources', response.body);
       return jsonDecode(response.body);
     } catch (e) {
-      print(e.toString());
+      showDialog<String>(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: Text("Ops"),
+          content: Text(
+              'Não foi possivel acessar a lista de traduções, tente mais tarde'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Ok",style: TextStyle(color: Theme.of(context).primaryColor)),
+            ),
+          ],
+        ),
+      );
+      return [];
     } finally {
       client.close();
     }
