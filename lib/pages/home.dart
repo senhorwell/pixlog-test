@@ -22,13 +22,17 @@ class _HomePageState extends State<HomePage> {
   late String moduleIndex;
   var initialized = false;
 
-  String convertDate(date) {
-    return DateFormat('dd/MM/yy').format(DateTime.parse(date).toLocal()).toString();
+  String convertDate(String date) {
+    if(date.isNotEmpty && date != "null") {
+      return DateFormat('dd/MM/yy').format(DateTime.parse(date).toLocal()).toString();
+    } else {
+      return DateFormat('dd/MM/yy').format(DateTime.parse(DateTime.now().toString()).toLocal()).toString();
+    }
   }
 
   loadScreen() async {
     if (!initialized) {
-      resourceList = await translateService.getResourceFake();
+      resourceList = await translateService.getResources();
       resourceListFiltered = resourceList;
       var returned = TranslateService().organizeFilters(resourceList);
       moduleIndex = returned["moduleList"][0];
@@ -69,6 +73,8 @@ class _HomePageState extends State<HomePage> {
                   cursorColor: AppColors.primary,
                   onChanged: (text) {
                     setState((){
+                      languageIndex = languageList[0];
+                      moduleIndex = moduleList[0];
                       resourceListFiltered = translateService.searchResource(resourceList,text,"value");
                     });
                   },
@@ -89,6 +95,8 @@ class _HomePageState extends State<HomePage> {
                         icon: const Icon(Icons.search,color: AppColors.primary),
                         onPressed: () {
                           setState((){
+                            languageIndex = languageList[0];
+                            moduleIndex = moduleList[0];
                             resourceListFiltered = translateService.searchResource(resourceList,search.text,"value");
                           });
                         },
@@ -124,7 +132,13 @@ class _HomePageState extends State<HomePage> {
                         isExpanded: true,
                         onChanged: (String? value) {
                           setState((){
-                            resourceListFiltered = TranslateService().searchResource(resourceList, value, "language_id");
+                            search.clear();
+                            moduleIndex = moduleList[0];
+                            if (value != "Selecione") {
+                              resourceListFiltered = TranslateService().searchResource(resourceList, value, "language_id");
+                            } else {
+                              resourceListFiltered = TranslateService().searchResource(resourceList, "", "language_id");
+                            }
                           });
                         },
                         onSaved: (String? value) {
@@ -171,7 +185,13 @@ class _HomePageState extends State<HomePage> {
                         isExpanded: true,
                         onChanged: (String? value) {
                           setState((){
-                            resourceListFiltered = TranslateService().searchResource(resourceList, value, "module_id");
+                            search.clear();
+                            languageIndex = languageList[0];
+                            if (value != "Selecione") {
+                              resourceListFiltered = TranslateService().searchResource(resourceList, value, "module_id");
+                            } else {
+                              resourceListFiltered = TranslateService().searchResource(resourceList, "", "module_id");
+                            }
                           });
                         },
                         onSaved: (String? value) {
@@ -231,7 +251,7 @@ class _HomePageState extends State<HomePage> {
                                 flex: 1,
                                 child: Column(
                                   children: [
-                                    Text(convertDate(resourceListFiltered[index]["resource"]["updated_at"]))
+                                    Text(convertDate(resourceListFiltered[index]["resource"]["updated_at"].toString()))
                                   ],
                                 ),
                               ),
@@ -246,7 +266,19 @@ class _HomePageState extends State<HomePage> {
             ],
           );
         }
-      )
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.primary,
+        onPressed: () {
+          TranslateService().cleanLocalResources();
+          Navigator.of(context).pushReplacement(PageRouteBuilder(
+            pageBuilder: (c, a1, a2) => const HomePage(),
+            transitionsBuilder: (c, anim, a2, child) => FadeTransition(opacity: anim, child: child),
+            transitionDuration: const Duration(milliseconds: 500),
+          ),);
+        },
+        child: const Icon(Icons.restart_alt_rounded),
+      ),
     );
   }
 }
