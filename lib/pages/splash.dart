@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'dart:async';
 import 'package:pixlog_translater/pages/home.dart';
 import 'package:pixlog_translater/themes/app_colors.dart';
@@ -40,14 +39,14 @@ class _SplashScreenState extends State<SplashPage>
   }
 
   Future<bool> _mockCheckForSession() async {
-    await Future.delayed(Duration(milliseconds: 3000), () {});
+    await Future.delayed(const Duration(milliseconds: 3000), () {});
     _navigateToHome();
 
     return true;
   }
 
   void _navigateToHome() {
-    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => HomePage()));
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const HomePage()));
   }
 
   @override

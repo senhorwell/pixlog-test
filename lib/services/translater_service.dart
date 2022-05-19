@@ -23,8 +23,8 @@ class TranslateService {
         barrierDismissible: false,
         context: context,
         builder: (BuildContext context) => AlertDialog(
-          title: Text("Ops"),
-          content: Text(
+          title: const Text("Ops"),
+          content: const Text(
               'Não foi possivel acessar a lista de traduções, tente mais tarde'),
           actions: <Widget>[
             TextButton(

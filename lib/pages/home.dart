@@ -49,7 +49,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         elevation: 0,
-        title: const Text("Tradutor"),
+        title: const Text("PixLog Translater"),
         backgroundColor: AppColors.primary,
         centerTitle: true,
       ),
